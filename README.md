@@ -2,7 +2,7 @@
 
 # Simulatore cinematico
 
-DEMO
+[DEMO](https://jumpjack.github.io/mechsim/simulator/index.html)
 
 ## Introduzione
 
@@ -16,7 +16,8 @@ Il simulatore si apre con una macchina di default dotata di una sola ruota alla 
 
 ## Estensione
 
-Nella cartella types ci sono le cartelle gears, links e parts: per aggiungere un nuovo elemento bisogna aggiungere una nuova cartella in gears, ed eventualmente in links, se si tratta di elementi collegati tra loro, contenente i due file create.js (per creare il solido visibile) e solve.js (per calcolare come l'oggetto si muove). Non ho idea di come funzionino questi file, prodotti al 100% dall'IA, quindi al momento l'unico modo che conosco per aggiungere nuovi elementi è passare all'IA lo zip dell'intero progetto, e chiedergli di aggiungere qualcosa: penserà lei automaticamente a fornire i file necessari.
+Nella cartella types ci sono le cartelle gears, links e parts: per aggiungere un nuovo elemento bisogna aggiungere una nuova cartella in gears, ed eventualmente in links, se si tratta di elementi collegati tra loro, contenente i due file create.js (per creare il solido visibile) e solve.js (per calcolare come l'oggetto si muove). Non ho idea di come funzionino questi file, prodotti al 100% dall'IA, quindi al momento l'unico modo che conosco per aggiungere nuovi elementi è passare all'IA lo zip dell'intero progetto ( si può fare con Claude Sonnet 5.5, ma gratis funziona solo per una decina di minuti ogni 5 ore, o con Grok), e chiedergli di aggiungere qualcosa: penserà lei automaticamente a fornire i file necessari.
+
 
 
 
