@@ -1,0 +1,10 @@
+{
+  "name": "simulatore-ingranaggi",
+  "private": true,
+  "description": "Simulatore di meccanismi a ingranaggi (Babylon.js), diviso in nucleo + tipi aggiungibili",
+  "scripts": {
+    "bundle": "node tools/bundle.js",
+    "test": "node test/run.js new /tmp/new.json && echo \"Per il confronto con l'originale: ORIG_SCRIPT=... node test/run.js orig /tmp/orig.json && python3 test/compare.py /tmp/orig.json /tmp/new.json\""
+  },
+  "devDependencies": { "babylonjs": "*", "jsdom": "*" }
+}

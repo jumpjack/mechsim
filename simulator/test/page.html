@@ -1,0 +1,33 @@
+<!doctype html><html><body>
+<h1 id="title"></h1><canvas id="stage" width="800" height="600"></canvas>
+<div id="selected"></div><input id="speed" type="range" min="-100" max="100" value="0"><span id="rpmLabel"></span>
+<div id="groups"></div><input id="keySpeed" type="range"><input id="keyOffset" type="range"><input id="decliSlider" type="range">
+<span id="keyRpmLabel"></span><span id="keyOffLabel"></span><span id="decliLabel"></span><div id="check"></div><div id="note"></div>
+<div id="wheelControls"></div><div id="controls"></div><div id="variants"></div><div id="status"></div><div id="brakes"></div>
+<button id="siderealTime"></button><button id="siderealTimeRegulator"></button><div id="showSpeeds"></div><div id="keyTitle"></div>
+<table><tbody id="gearRows"></tbody></table><div id="siderostatAngles"></div>
+<script src="../node_modules/babylonjs/babylon.js"></script>
+<script>
+  // stub dell'ambiente HTML originale (non fornito): log, contesto d'errore, debug
+  var LOG = [], DBG = { on: false, always: false }, CTX = { where: '' }, seenMsgs = new Set();
+  var fmtA = a => a.map(x => typeof x === 'string' ? x : (()=>{try{return JSON.stringify(x)}catch(e){return String(x)}})()).join(' ');
+  function step(t, ...a) { LOG.push(['step', t, fmtA(a)]); }
+  function warn(t, ...a) { LOG.push(['warn', t, fmtA(a)]); }
+  function fail(t, ...a) { LOG.push(['fail', t, fmtA(a)]); }
+  function reportError(t, e) { LOG.push(['ERROR', t, e && e.message]); console.error('[reportError]', t, e && e.stack); }
+  // canvas 2D finto (jsdom non ha il pacchetto canvas): serve alle etichette X/Y/Z
+  HTMLCanvasElement.prototype.getContext = function (t) {
+    if (t !== '2d') return null;
+    const st = {};
+    return new Proxy(st, { get: (o, p) => p === 'measureText' ? () => ({ width: 10 }) : (p in o ? o[p] : () => {}), set: (o, p, v) => { o[p] = v; return true; } });
+  };
+  // Babylon senza WebGL
+  (function () {
+    const NE = BABYLON.NullEngine, ver = NE.Version;
+    BABYLON.Engine = function () { return new NE({ renderWidth: 800, renderHeight: 600, textureSize: 512, deterministicLockstep: false, lockstepMaxSteps: 4 }); };
+    BABYLON.Engine.Version = ver;
+  })();
+</script>
+<script src="machine.js"></script>
+<script id="app"></script>
+</body></html>
