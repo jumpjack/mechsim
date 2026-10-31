@@ -1,11 +1,4 @@
-/*
-  Campi nuovi/rilevanti per la cinematica:
-   • asse  "rest": "carrier"  → se nessun altro vincolo ne determina la velocità, l'asse non gira rispetto al suo carrier
-                                (senza questo campo, un asse non vincolato resta fermo rispetto al mondo, come prima).
-   • meshWith può essere una stringa oppure {id:"..."}; basta dichiarare la coppia una sola volta (i doppioni sono ignorati).
-   • Velocità: ogni asse ha una velocità w = componente, lungo il proprio asse, della velocità angolare assoluta.
-     La velocità relativa al carrier è calcolata correttamente anche quando l'asse è perpendicolare al carrier.
-*/
+
 var MACHINE = {
   "title": "Eliostato 'primo modello'",
   "show": [
