@@ -1,5 +1,8 @@
 # mechsim
 
+<img width="678" height="398" alt="image" src="https://github.com/user-attachments/assets/f759c520-070b-48da-826d-e29343bd3db3" />
+
+
 # Simulatore cinematico
 
 [DEMO](https://jumpjack.github.io/mechsim/simulator/index.html)
