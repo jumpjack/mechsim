@@ -1,7 +1,8 @@
 /* types/gears/anchor/create.js
-   Ancora / pallet Graham-like:
+   Ancora Graham (deadbeat) realistica:
    - bracci eleganti
-   - pallet con faccia di blocco (quasi concentrica) + faccia di impulso inclinata
+   - pallet con faccia di blocco concentrica (approssimata a più punti)
+   - faccia di impulso inclinata
 */
 function earClip(poly) {
   const idx = poly.map((_, i) => i), tris = [];
@@ -59,27 +60,42 @@ function discPoly(R, segs = 24) {
 }
 
 /**
- * Genera un pallet Graham-like.
- * - faccia di blocco (quasi concentrica rispetto al centro ancora)
- * - faccia di impulso inclinata
+ * Pallet Graham con faccia di blocco concentrica (arco approssimato)
+ * e faccia di impulso inclinata.
  */
 function palletPoly(armLen, ang, palletW, palletH, isEntry) {
   const ca = Math.cos(ang), sa = Math.sin(ang);
-  const rx = ca, ry = sa;
-  const tx = -sa, ty = ca;
+  const rx = ca, ry = sa;          // radiale
+  const tx = -sa, ty = ca;         // tangenziale
 
-  const lockLen = palletH * 0.55;
-  const impulseLen = palletH * 0.55;
-  const thick = palletW * 0.55;
+  const thick = palletW * 0.7;
+  const lockArc = palletH * 0.55;  // lunghezza faccia di blocco
+  const impLen  = palletH * 0.50;  // lunghezza faccia di impulso
   const sign = isEntry ? 1 : -1;
 
-  const ptsLocal = [
-    [-thick * 0.3, -lockLen * 0.9],
-    [ thick * 0.9, -lockLen],
-    [ thick * 1.0,  0],
-    [ thick * 0.4,  impulseLen],
-    [-thick * 0.4,  impulseLen * 0.6]
-  ];
+  // Approssimazione di un arco concentrico per la locking face
+  // (3-4 punti su un raggio leggermente diverso)
+  const ptsLocal = [];
+
+  // Lato interno vicino al braccio
+  ptsLocal.push([-thick * 0.35, -lockArc * 0.95]);
+
+  // Faccia di blocco (arco → più punti)
+  const nArc = 4;
+  for (let i = 0; i <= nArc; i++) {
+    const t = i / nArc;
+    const v = -lockArc + t * lockArc * 1.05;
+    // leggero “draw” (sotto-taglio) per simulare la concentrica
+    const u = thick * (0.85 + 0.15 * Math.sin(t * Math.PI));
+    ptsLocal.push([u, v]);
+  }
+
+  // Ginocchio / inizio impulso
+  ptsLocal.push([thick * 0.95, 0.05 * palletH]);
+
+  // Faccia di impulso inclinata
+  ptsLocal.push([thick * 0.35, impLen]);
+  ptsLocal.push([-thick * 0.25, impLen * 0.7]);
 
   return ptsLocal.map(([u, v]) => {
     const vv = v * sign;
@@ -89,13 +105,13 @@ function palletPoly(armLen, ang, palletW, palletH, isEntry) {
   });
 }
 
-function armPoly(ang, armLen, width = 4.2) {
-  const r0 = 5.5;
+function armPoly(ang, armLen, width = 5.0) {
+  const r0 = 6.0;
   const half = width / 2;
   const pts = [
     [r0, -half],
-    [armLen - 2, -half * 0.85],
-    [armLen - 2,  half * 0.85],
+    [armLen - 3, -half * 0.75],
+    [armLen - 3,  half * 0.75],
     [r0,  half]
   ];
   const ca = Math.cos(ang), sa = Math.sin(ang);
@@ -110,26 +126,20 @@ function anchorSolids({ spanDeg, armLen, palletW, palletH, pendLen, bobR, w0, w1
   const midAng  = centerAng;
   const cm = Math.cos(midAng), sm = Math.sin(midAng);
 
-  // mozzo centrale
-  out.push(extrudePolygon(discPoly(6.5, 20), w0, w1));
+  // Mozzo
+  out.push(extrudePolygon(discPoly(7.0, 22), w0, w1));
 
-  // bracci
+  // Bracci
   out.push(extrudePolygon(armPoly(leftAng,  armLen), w0, w1));
   out.push(extrudePolygon(armPoly(rightAng, armLen), w0, w1));
 
-  // pallet (entry = sinistra, exit = destra)
-  out.push(extrudePolygon(
-    palletPoly(armLen, leftAng,  palletW, palletH, true),
-    w0, w1
-  ));
-  out.push(extrudePolygon(
-    palletPoly(armLen, rightAng, palletW, palletH, false),
-    w0, w1
-  ));
+  // Pallet
+  out.push(extrudePolygon(palletPoly(armLen, leftAng,  palletW, palletH, true),  w0, w1));
+  out.push(extrudePolygon(palletPoly(armLen, rightAng, palletW, palletH, false), w0, w1));
 
-  // asta + bob del pendolo
+  // Asta + bob
   if (pendLen > 0) {
-    const rodLocal = [[0, -1.8], [pendLen, -1.8], [pendLen, 1.8], [0, 1.8]];
+    const rodLocal = [[0, -2.0], [pendLen, -2.0], [pendLen, 2.0], [0, 2.0]];
     const rod = rodLocal.map(([x, y]) => [x * cm - y * sm, x * sm + y * cm]);
     const z0 = w1 + 3;
     const z1 = z0 + 5;
@@ -191,12 +201,12 @@ function computeAutoAngle(g) {
 
 Registry.gear('anchor', {
   noRadiusCheck: true,
-  radius: g => (g.armLen ?? 38) + (g.palletW ?? 10),
+  radius: g => (g.armLen ?? 38) + (g.palletW ?? 12),
   solids: g => {
     const span    = g.span    ?? 90;
     const armLen  = g.armLen  ?? 38;
-    const palletW = g.palletW ?? 10;
-    const palletH = g.palletH ?? 8;
+    const palletW = g.palletW ?? 12;
+    const palletH = g.palletH ?? 9;
     const pendLen = g.pendLen ?? 160;
     const bobR    = g.bobR    ?? 14;
     const w0 = g.w?.[0] ?? -2;

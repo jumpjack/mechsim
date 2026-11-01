@@ -1,10 +1,8 @@
 /* =====================================================================
    types/gears/spur/solve.js
-   Ingranaggio cilindrico a denti dritti (type "spur")
-   Metà "COME SI RISOLVE" del tipo: validazione del JSON, parametri, cinematica. La geometria è in create.js.
    ===================================================================== */
 Registry.gear('spur', {
-  meshWith: ['spur'],          // tipi con cui può essere in presa (meshWith)
+  meshWith: ['spur'],
   minTeeth: 3,
 
   validate(g, w, { E, isVec }) {

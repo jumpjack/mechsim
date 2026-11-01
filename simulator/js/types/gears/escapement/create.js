@@ -1,6 +1,9 @@
 /* types/gears/escapement/create.js
-   Ruota di scappamento Graham-like: denti uniti al corpo,
-   faccia di blocco quasi radiale + faccia di impulso inclinata.
+   Ruota di scappamento Graham (deadbeat) realistica:
+   - denti uniti al corpo
+   - faccia di blocco quasi radiale
+   - faccia di impulso inclinata
+   - proporzioni tipiche (root ~82% del raggio esterno)
 */
 function earClip(poly) {
   const idx = poly.map((_, i) => i), tris = [];
@@ -58,69 +61,58 @@ function discPoly(R, segs = 48) {
 }
 
 /**
- * Profilo continuo della ruota di scappamento.
+ * Profilo continuo Graham.
  * Ogni dente:
- *  - base (root)
- *  - faccia di blocco quasi radiale
+ *  - root
+ *  - faccia di blocco quasi radiale (leggermente sotto-taglio)
  *  - punta
- *  - faccia di impulso inclinata che torna al root
- * I denti sono uniti al corpo → nessun pezzo staccato.
+ *  - faccia di impulso inclinata
+ * Proporzioni tipiche: root ≈ 0.82 R, denti più “corti” e pieni.
  */
 function escapementProfile(N, R) {
   const pts = [];
-  const Rroot = R * 0.68;
+  const Rroot = R * 0.82;
   const Rtip  = R;
   const pitch = 2 * Math.PI / N;
 
-  // Larghezza angolare del dente alla base (circa 30-35% del passo)
-  const baseHalf = pitch * 0.18;
-  // Quanto la faccia di blocco è “radiale” (piccolo offset angolare)
-  const lockOffset = pitch * 0.04;
-  // Quanto la faccia di impulso è inclinata
-  const impulseOffset = pitch * 0.22;
+  // Larghezza angolare alla base (più piena)
+  const baseHalf = pitch * 0.28;
+  // Offset faccia di blocco (quasi radiale)
+  const lockOff  = pitch * 0.06;
+  // Offset faccia di impulso (più lunga e inclinata)
+  const impOff   = pitch * 0.32;
 
   for (let i = 0; i < N; i++) {
     const a = i * pitch;
 
-    // 1. Punto di root a sinistra del dente
-    pts.push([
-      Rroot * Math.cos(a - baseHalf),
-      Rroot * Math.sin(a - baseHalf)
-    ]);
+    // 1. Root sinistro
+    pts.push([Rroot * Math.cos(a - baseHalf), Rroot * Math.sin(a - baseHalf)]);
 
-    // 2. Faccia di blocco (quasi radiale, leggermente sotto-taglio)
-    pts.push([
-      Rtip * 0.92 * Math.cos(a - lockOffset),
-      Rtip * 0.92 * Math.sin(a - lockOffset)
-    ]);
+    // 2. Inizio faccia di blocco (quasi radiale)
+    pts.push([Rtip * 0.96 * Math.cos(a - lockOff), Rtip * 0.96 * Math.sin(a - lockOff)]);
 
-    // 3. Punta del dente
-    pts.push([
-      Rtip * Math.cos(a),
-      Rtip * Math.sin(a)
-    ]);
+    // 3. Punta
+    pts.push([Rtip * Math.cos(a), Rtip * Math.sin(a)]);
 
-    // 4. Faccia di impulso (inclinata) che scende verso il root
-    pts.push([
-      Rroot * Math.cos(a + impulseOffset),
-      Rroot * Math.sin(a + impulseOffset)
-    ]);
+    // 4. Fine faccia di impulso → torna al root
+    pts.push([Rroot * Math.cos(a + impOff), Rroot * Math.sin(a + impOff)]);
   }
-
-  // Chiudiamo il poligono (torna al primo punto)
   return pts;
 }
 
 function escapementSolids(N, w0, w1, R) {
   const solids = [];
 
-  // Corpo centrale leggermente più piccolo del root
-  const Rhub = R * 0.55;
-  solids.push(extrudePolygon(discPoly(Rhub, 40), w0, w1));
+  // Mozzo / corpo interno
+  const Rhub = R * 0.48;
+  solids.push(extrudePolygon(discPoly(Rhub, 36), w0, w1));
 
-  // Profilo esterno continuo (denti + root uniti)
-  const profile = escapementProfile(N, R);
-  solids.push(extrudePolygon(profile, w0, w1));
+  // Anello di rinforzo sotto i denti
+  const Rring = R * 0.78;
+  solids.push(extrudePolygon(discPoly(Rring, 48), w0 * 0.7, w1 * 0.7));
+
+  // Profilo esterno continuo (denti uniti)
+  solids.push(extrudePolygon(escapementProfile(N, R), w0, w1));
 
   return solids;
 }

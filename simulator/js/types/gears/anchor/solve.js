@@ -11,7 +11,7 @@ Registry.gear('anchor', {
       if (typeof val === 'number') return val;
       if (typeof val === 'string') {
         try {
-          return ev(val); // Valuta la stringa (es. "pendulumLength") tramite l'evaluator del motore
+          return ev(val); // valuta "pendulumLength" → valore live dello slider
         } catch (e) {
           const parsed = parseFloat(val);
           return isNaN(parsed) ? defVal : parsed;
@@ -20,12 +20,17 @@ Registry.gear('anchor', {
       return defVal;
     };
 
-    // Assegna e salva i valori risolti sull'ingranaggio g
-    g.pendLen = evalParam(g.def?.pendulumLength ?? g.def?.pendLen, 160);
-    g.armLen  = evalParam(g.def?.armLen, 38);
-    g.span    = evalParam(g.def?.span, 90);
-    g.palletW = evalParam(g.def?.palletW, 10);
-    g.palletH = evalParam(g.def?.palletH, 8);
-    g.bobR    = evalParam(g.def?.bobR, 14);
+    // IMPORTANTE: non sovrascrivere g.def.pendulumLength (deve restare la stringa del controllo)
+    // altrimenti al rebuild successivo non viene più rivalutato lo slider.
+    const src = g.def || {};
+    g.pendLen = evalParam(
+      g.pendulumLength ?? src.pendulumLength ?? g.pendLen ?? src.pendLen,
+      160
+    );
+    g.armLen  = evalParam(g.armLen  ?? src.armLen,  38);
+    g.span    = evalParam(g.span    ?? src.span,    90);
+    g.palletW = evalParam(g.palletW ?? src.palletW, 12);
+    g.palletH = evalParam(g.palletH ?? src.palletH,  9);
+    g.bobR    = evalParam(g.bobR    ?? src.bobR,    14);
   }
 });
