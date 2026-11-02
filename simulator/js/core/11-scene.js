@@ -176,6 +176,19 @@ function gearSolids(g) {
   return solids;
 }
 
+// function resolvePart(p, ev) {
+//   const k = { shape: p.shape, n: p.n || 32, color: p.color };
+//   if (p.r !== undefined) k.r = ev(p.r);
+//   if (p.w) k.w = p.w.map(e => ev(e));
+//   k.at = (p.at || [0, 0]).map(e => ev(e));
+//   if (p.half) k.half = p.half.map(e => ev(e));
+//   if (p.poly) { k.poly = p.poly.map(pt => pt.map(e => ev(e))); k.y = p.y || [-1, 1]; }
+//   const impl = Registry.get('part', k.shape);          // la forma la costruisce types/parts/<forma>/create.js → solid(k)
+//   if (!impl || !impl.solid) throw new Error(`forma di parte sconosciuta: "${k.shape}"`);
+//   const solid = impl.solid(k);
+//   return { key: k, solid };
+// }
+
 function resolvePart(p, ev) {
   const k = { shape: p.shape, n: p.n || 32, color: p.color };
   if (p.r !== undefined) k.r = ev(p.r);
@@ -183,7 +196,36 @@ function resolvePart(p, ev) {
   k.at = (p.at || [0, 0]).map(e => ev(e));
   if (p.half) k.half = p.half.map(e => ev(e));
   if (p.poly) { k.poly = p.poly.map(pt => pt.map(e => ev(e))); k.y = p.y || [-1, 1]; }
-  const impl = Registry.get('part', k.shape);          // la forma la costruisce types/parts/<forma>/create.js → solid(k)
+
+  // --- FIX ESTENSIBILITÀ: lascia passare tutti gli altri campi ---
+  const known = new Set(['shape','n','color','r','w','at','half','poly','y']);
+  for (const key of Object.keys(p)) {
+    if (known.has(key)) continue;
+    const v = p[key];
+    if (typeof v === 'number' || typeof v === 'string') {
+      try { k[key] = ev(v); } catch { k[key] = v; }
+    } else if (Array.isArray(v)) {
+      k[key] = v.map(e => {
+        if (typeof e === 'number' || typeof e === 'string') {
+          try { return ev(e); } catch { return e; }
+        }
+        return e;
+      });
+    } else if (v && typeof v === 'object') {
+      const o = {};
+      for (const kk in v) {
+        const vv = v[kk];
+        if (typeof vv === 'number' || typeof vv === 'string') {
+          try { o[kk] = ev(vv); } catch { o[kk] = vv; }
+        } else o[kk] = vv;
+      }
+      k[key] = o;
+    } else {
+      k[key] = v;
+    }
+  }
+
+  const impl = Registry.get('part', k.shape);
   if (!impl || !impl.solid) throw new Error(`forma di parte sconosciuta: "${k.shape}"`);
   const solid = impl.solid(k);
   return { key: k, solid };

@@ -446,6 +446,8 @@ CTX.where = '';
       const phi = Math.atan2(V.dot(g.cdir, V.mul(g.ax.yv, g.side)), V.dot(g.cdir, g.ax.ref));
       const im = gImpl(g);
       g.rho = phi + (g.role === 'gap' && !(im && im.toothPhase === false) ? PI / g.z : 0);
+      const ang = g.def.angle!==undefined ? ev(g.def.angle) : (g.def.phase!==undefined ? ev(g.def.phase) : 0);
+      if(ang) g.rho += ang * PI/180;      
     }
   }
 
