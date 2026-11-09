@@ -1,0 +1,113 @@
+{
+  "title": "microsiderostato Foucault",
+  "consts": { "module": 1, "satDistance" : 150 },
+  "controls": [
+    { "id": "teeth_A", "label": "Denti portante", "step": 1,
+      "ranges": { "all": { "min": 40, "max": 400, "value": 80 } } },
+      
+    { "id": "teeth_a", "label": "driver a", "step": 1,
+      "ranges": { "all": { "min": 6, "max": 40, "value": 10 } } },
+      
+    { "id": "teeth_a1", "label": "deiver a1", "step": 1,
+      "ranges": { "all": { "min": 6, "max": 40, "value": 9 } } },
+      
+    { "id": "teeth_b", "label": "satellite b di uscita", "step": 1,
+      "ranges": { "all": { "min": 0, "max": 40, "value": 8 } } },
+      
+    { "id": "satDistance", "label": "interasse satelliti", "step": 1,
+      "ranges": { "all": { "min": 10, "max": 140, "value": 90 } } },
+      
+  ],
+  "axes": [
+    {
+      "id": "axis_h24_up", "name": "Asse orologio 24h superiore",
+      "dir": [0, 1, 0], "place": { "at": [0, 0, 0] }, "color": "#aaaaaa",
+      "parts": [ { "shape": "cylinder", "r": 2, "w": [-100,100], "n" : 6 }  ]
+    },
+    {
+      "id": "axis_A", "name": "Asse portasatelliti A",
+      "dir": [0, 1, 0], "place": { "at": [0, 0, 0] }, "color": "#ff0000",
+      "parts": [ { "shape": "cylinder", "r": 4, "w": [-20,20], "n" : 6 }  ]
+    },
+    {
+      "id": "axis_sat_up", "name": "Asse satelliti superiore",
+      "dir": [0, 1, 0], "place": { "at": [0, 0, "3 * teeth_b"] }, "color": "#888888",
+      "parts": [ { "shape": "cylinder", "r": 2, "w": [-50,50] , "n" : 6} ],
+      "carrier" : "axis_A"
+    },
+
+
+    {
+      "id": "axis_K_a_a1", "name": "Asse da orologio inferiore",
+      "dir": [0, 1, 0], "place": { "at": ["-teeth_A/2 - teeth_a1/2",0, 0 ] }, "color": "#888888",
+      "parts": [ { "shape": "cylinder", "r": 2, "w": [-100,100] , "n" : 6} ]
+    },
+
+  ],
+  "gears": [
+    {
+      "id": "gear_A1", "name": "ruota A1 oraria h24",
+      "type": "spur", "axis": "axis_h24_up",
+      "teeth": "teeth_A", "module" : "module", "pos": -100, "thickness": 5, "color": "#ffff00",
+      "free" : false, "bore" : 2, "meshWith" : "gear_a1"
+    },
+
+    {
+      "id": "gear_A", "name": "ruota A portasatelliti",
+      "type": "spur", "axis": "axis_A",
+      "teeth": "teeth_A", "module" : "module", "pos": 0, "thickness": 5, "color": "#ff0000",
+      "free" : false, "bore" : 4, "meshWith" : "gear_a"
+    },
+
+//Satelliti
+    {
+      "id": "gear_c", "name": "satellite c (input)",
+      "type": "spur", "axis": "axis_sat_up",
+      "teeth": "4 * teeth_b", "module" : "module", "pos": -50, "thickness": 5, "color": "#00ff00",
+       "meshWith" : "gear_C"
+    },
+
+    {
+      "id": "gear_b", "name": "satellite b (output)",
+      "type": "spur", "axis": "axis_sat_up",
+      "teeth": "teeth_b", "module" : "module", "pos": 50, "thickness": 10, "color": "#00ff00",
+
+    },
+
+// Pianeti
+    {
+      "id": "gear_C", "name": "pianeta C (input)",
+      "type": "spur", "axis": "axis_h24_up",
+      "teeth": "2 * teeth_b", "module" : "module", "pos": -50, "thickness": 10, "color": "#8888ff",
+      "free" : true, "bore" : 4
+    },
+
+    {
+      "id": "gear_B", "name": "pianeta B (output)",
+      "type": "spur", "axis": "axis_h24_up",
+      "teeth": "5 * teeth_b", "module" : "module", "pos": 45, "thickness": 5, "color": "#8888ff",
+      "free" : true, "bore" : 4, "meshWith" : "gear_b"
+    },
+    
+// Asse K_a_a1
+    
+    {
+      "id": "gear_a", "name": "driver a",
+      "type": "spur", "axis": "axis_K_a_a1",
+      "teeth": "teeth_a", "module" : "module", "pos": -10, "thickness": 20, "color": "#8888ff",
+      "free" : false
+    },
+    {
+      "id": "gear_a1", "name": "driver a",
+      "type": "spur", "axis": "axis_K_a_a1",
+      "teeth": "teeth_a1", "module" : "module", "pos": -110, "thickness": 20, "color": "#8888ff",
+      "free" : false
+    },
+
+
+  ],
+  "links": [
+  ],
+  "inputs": [], "groups": [], "variants": {}, "ratios": [], "checks": [], "notes": [],
+  "views": [ { "id": "all", "label": "Insieme", "auto": true, "alpha": 1.57, "beta": 1.2, "scale": 1.1 } ]
+}
