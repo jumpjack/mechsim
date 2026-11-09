@@ -1,0 +1,42 @@
+{
+  "title": "Scappamento di Graham (dead-beat) con ruota e pendolo - piano verticale, gravita' verso Z-",
+  "consts": { "R": 30, "N": 30 },
+  "controls": [
+    { "id": "pendulumLength", "label": "Lunghezza del pendolo (mm)", "step": 1,
+      "ranges": { "all": { "min": 60, "max": 400, "value": 160 } } },
+    { "id": "armLength", "label": "Lunghezza dei bracci dell'ancora (mm)", "step": 0.5,
+      "ranges": { "all": { "min": 12, "max": 80, "value": 29 } } },
+    { "id": "armAngle", "label": "Apertura dei bracci dell'ancora (gradi)", "step": 1,
+      "ranges": { "all": { "min": 30, "max": 170, "value": 106 } } }
+  ],
+  "axes": [
+    {
+      "id": "asse_ruota_CS", "name": "Asse della ruota di scappamento (orizzontale, lungo Y)",
+      "dir": [0, 1, 0], "place": { "at": [0, 0, 0] }, "color": "#8899aa",
+      "parts": [ { "shape": "cylinder", "r": 2, "w": [-6, 18] } ]
+    },
+    {
+      "id": "asse_ancora_CS", "name": "Asse dell'ancora e del pendolo (sopra la ruota)",
+      "dir": [0, 1, 0], "place": { "at": [0, 0, "R/cos(pi*7.5/N)"] }, "color": "#6688aa",
+      "parts": [ { "shape": "cylinder", "r": 2, "w": [-6, 18] } ]
+    }
+  ],
+  "gears": [
+    {
+      "id": "ruota_CS", "name": "Ruota di scappamento (30 denti)",
+      "type": "escape_wheel_CS", "axis": "asse_ruota_CS",
+      "r": "R", "teeth": "N", "pos": 0, "thickness": 4, "color": "#d9b45a"
+    },
+    {
+      "id": "ancora_CS", "name": "Ancora di Graham con pendolo",
+      "type": "anchor_CS", "axis": "asse_ancora_CS",
+      "pendulumLength": "pendulumLength", "armLength": "armLength", "armAngle": "armAngle",
+      "pos": 0, "thickness": 4, "color": "#66aadd"
+    }
+  ],
+  "links": [
+    { "type": "graham_escapement_CS", "wheel": "ruota_CS", "anchor": "ancora_CS", "span": 7.5, "gravityDir": [0, 0, -1] }
+  ],
+  "inputs": [], "groups": [], "variants": {}, "ratios": [], "checks": [], "notes": [],
+  "views": [ { "id": "all", "label": "Insieme", "auto": true, "alpha": -1.57, "beta": 1.45, "scale": 1.1 } ]
+}
