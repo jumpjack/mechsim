@@ -48,6 +48,7 @@ camera.minZ = 1;
 canvas.addEventListener('wheel', e => e.preventDefault(), { passive: false });
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 new BABYLON.HemisphericLight('sky', new V3(.3, 1, .5), scene).intensity = .75;
+new BABYLON.HemisphericLight('sky', new V3(0,0,0), scene).intensity = .75;
 new BABYLON.DirectionalLight('sun', new V3(.5, -1, -.7), scene).intensity = .8;
 
 const matCache = {};
